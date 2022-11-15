@@ -8,7 +8,7 @@
 
         public void AddMessage(string Author, string Content)
         {
-            Messages.Add(new ChatMessage()
+            Messages.Insert(0, new ChatMessage()
             {
                 Name = Author,
                 Message = Content
