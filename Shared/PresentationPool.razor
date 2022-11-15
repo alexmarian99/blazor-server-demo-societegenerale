@@ -1,4 +1,5 @@
-﻿@implements IDisposable
+﻿@using Blazored.LocalStorage
+@implements IDisposable
 @inject PresentationReview presReview
 
 <h3>Results of votes review of this presentation</h3>
@@ -21,13 +22,16 @@
 }
 
 @code {
-    private int SelectedValue = 1;
-    private bool voted { get; set; } = false;
+    [Inject] private ILocalStorageService localStorage { get; set; }
 
-    protected override Task OnAfterRenderAsync(bool firstRender)
+    private int SelectedValue = 1;
+    private bool voted { get; set; } = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         presReview.UpdateUiEvent += UpdateUI;
-        return base.OnAfterRenderAsync(firstRender);
+        voted = !string.IsNullOrEmpty(await localStorage.GetItemAsync<string>("voted_sg"));
+        StateHasChanged();
     }
 
     void IDisposable.Dispose()
@@ -47,5 +51,6 @@
     {
         presReview.AddGrade(SelectedValue);
         voted = true;
+        localStorage.SetItemAsync("voted_sg", true);
     }
 }
