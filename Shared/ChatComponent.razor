@@ -18,7 +18,8 @@ else
     <h5>Messages</h5>
     @foreach (var messageEntry in chatSystem.Messages)
     {
-        <p>@messageEntry.Name said: @messageEntry.Message</p>
+        <p><b>@messageEntry.Name</b> said:<br/>
+            @messageEntry.Message</p>
     }
 }
 
