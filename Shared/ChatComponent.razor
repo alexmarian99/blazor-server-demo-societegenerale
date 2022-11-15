@@ -1,0 +1,67 @@
+﻿@inject ChatSystem chatSystem
+@implements IDisposable
+
+<h3>Chat</h3>
+
+@if (string.IsNullOrEmpty(UserName))
+{;
+    <h5>Name:</h5>
+    <input type="text" @bind="textboxName"/>
+    <button @onclick="SetName">Set name</button>
+}
+else
+{
+    <h5>Message:</h5>
+    <input type="text" @bind="textboxMessage"/>
+    <button @onclick="SendMessage">Send message</button>
+    <br /><br />
+    <h5>Messages</h5>
+    @foreach (var messageEntry in chatSystem.Messages)
+    {
+        <p>@messageEntry.Name said: @messageEntry.Message</p>
+    }
+}
+
+
+@code {
+    public string UserName { get; set; } = string.Empty;
+
+    private string textboxName = string.Empty;
+    private string textboxMessage = string.Empty;
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        chatSystem.UpdateUiEvent += UpdateUI;
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    void IDisposable.Dispose()
+    {
+        chatSystem.UpdateUiEvent -= UpdateUI;
+    }
+
+    public void UpdateUI()
+    {
+        InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
+
+    public void SetName()
+    {
+        if (!string.IsNullOrEmpty(textboxName))
+        {
+            UserName = textboxName;
+        }
+    }
+
+    public void SendMessage()
+    {
+        if (!string.IsNullOrEmpty(textboxMessage))
+        {
+            chatSystem.AddMessage(UserName, textboxMessage);
+            textboxMessage = string.Empty;
+        }
+    }
+}

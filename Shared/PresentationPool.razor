@@ -1,0 +1,51 @@
+﻿@implements IDisposable
+@inject PresentationReview presReview
+
+<h3>Results of votes review of this presentation</h3>
+<h5>Number of votes: @presReview.GradesList.Count</h5>
+@if (presReview.GradesList.Count != 0)
+{
+    <h5>Average value: @presReview.GradesList.Average().ToString("0.##")</h5>
+}
+@if (!voted)
+{
+    <h3>Note this presentation</h3>
+    <select @bind="SelectedValue">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+    </select>
+    <button @onclick="Vote">Vote</button>
+}
+
+@code {
+    private int SelectedValue = 1;
+    private bool voted { get; set; } = false;
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        presReview.UpdateUiEvent += UpdateUI;
+        return base.OnAfterRenderAsync(firstRender);
+    }
+
+    void IDisposable.Dispose()
+    {
+        presReview.UpdateUiEvent -= UpdateUI;
+    }
+
+    public void UpdateUI()
+    {
+        InvokeAsync(() =>
+        {
+            StateHasChanged();
+        });
+    }
+
+    public void Vote()
+    {
+        presReview.AddGrade(SelectedValue);
+        voted = true;
+    }
+}
